@@ -185,10 +185,11 @@
 		qcom,phy-supply-entry@0 {
 			reg = <0>;
 			qcom,supply-name = "vddio";
-			qcom,supply-min-voltage = <1744000>;
-			qcom,supply-max-voltage = <1904000>;
+			qcom,supply-min-voltage = <1800000>;
+			qcom,supply-max-voltage = <1800000>;
 			qcom,supply-enable-load = <100000>;
 			qcom,supply-disable-load = <100>;
+			qcom,supply-ulp-load = <0>;
 		};
 	};
 
@@ -203,6 +204,7 @@
 			qcom,supply-max-voltage = <1904000>;
 			qcom,supply-enable-load = <100000>;
 			qcom,supply-disable-load = <100>;
+			qcom,supply-ulp-load = <0>;
 		};
 	};
 };
@@ -399,36 +401,6 @@
 			};
 		};
 
-		xo-therm-adc {
-			polling-delay-passive = <0>;
-			polling-delay = <5000>;
-			thermal-sensors = <&pm8916_vadc 0x32>;
-			thermal-governor = "user_space";
-
-			trips {
-				active-config0 {
-					temperature = <65000>;
-					hysteresis = <1000>;
-					type = "passive";
-				};
-			};
-		};
-
-		pa-therm0-adc {
-			polling-delay-passive = <0>;
-			polling-delay = <5000>;
-			thermal-sensors = <&pm8916_vadc 0x36>;
-			thermal-governor = "user_space";
-
-			trips {
-				active-config0 {
-					temperature = <65000>;
-					hysteresis = <1000>;
-					type = "passive";
-				};
-			};
-		};
-
 		skin-therm-adc {
 			polling-delay-passive = <0>;
 			polling-delay = <5000>;
@@ -489,19 +461,9 @@
 					hysteresis = <2000>;
 					type = "passive";
 				};
-				qm215_modem_trip0: qm215-modem-trip0 {
-					temperature = <44000>;
-					hysteresis = <4000>;
-					type = "passive";
-				};
 				qm215_batt_trip1: qm215-batt-trip1 {
 					temperature = <45000>;
 					hysteresis = <4000>;
-					type = "passive";
-				};
-				qm215_modem_trip1: qm215-modem-trip1 {
-					temperature = <46000>;
-					hysteresis = <2000>;
 					type = "passive";
 				};
 				qm215_cpu_trip: qm215-cpu-trip {
@@ -512,11 +474,6 @@
 				qm215_gpu_trip: qm215-gpu-trip {
 					temperature = <50000>;
 					hysteresis = <0>;
-					type = "passive";
-				};
-				qm215_modem_trip2: qm215-modem-trip2 {
-					temperature = <60000>;
-					hysteresis = <5000>;
 					type = "passive";
 				};
 			};
@@ -549,18 +506,6 @@
 					cooling-device = <&msm_gpu
 							THERMAL_NO_LIMIT
 							(THERMAL_MAX_LIMIT-1)>;
-				};
-				modem_lvl1 {
-					trip = <&qm215_modem_trip0>;
-					cooling-device = <&modem_pa 1 1>;
-				};
-				modem_lvl2 {
-					trip = <&qm215_modem_trip1>;
-					cooling-device = <&modem_pa 2 2>;
-				};
-				modem_lvl3 {
-					trip = <&qm215_modem_trip2>;
-					cooling-device = <&modem_pa 3 3>;
 				};
 				battery_lvl1 {
 					trip = <&qm215_batt_trip0>;

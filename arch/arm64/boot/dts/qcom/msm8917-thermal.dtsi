@@ -361,4 +361,42 @@
 			};
 		};
 	};
+
+	pa-therm0-step {
+		polling-delay-passive = <100>;
+		polling-delay = <5000>;
+		thermal-sensors = <159 54>;
+		thermal-governor = "user_space";
+		trips {
+			qm215_modem_trip0: qm215-modem-trip0 {
+				temperature = <65000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+			qm215_modem_trip1: qm215-modem-trip1 {
+				temperature = <75000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+			qm215_modem_trip2: qm215-modem-trip2 {
+				temperature = <90000>;
+				hysteresis = <1000>;
+				type = "passive";
+			};
+		};
+		cooling-maps {
+			modem_lvl1 {
+				trip = <&qm215_modem_trip0>;
+				cooling-device = <&modem_pa 1 1>;
+			};
+			modem_lvl2 {
+				trip = <&qm215_modem_trip1>;
+				cooling-device = <&modem_pa 2 2>;
+			};
+			modem_lvl3 {
+				trip = <&qm215_modem_trip2>;
+				cooling-device = <&modem_pa 3 3>;
+			};
+		};
+	};
 };

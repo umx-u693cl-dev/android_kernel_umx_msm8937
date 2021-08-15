@@ -906,12 +906,12 @@
 		wsa-vi {
 			wsa_vi_on: wsa_vi_on {
 				mux {
-					pins = "gpio94", "gpio95";
+					pins = "gpio95";
 					function = "wsa_io";
 				};
 
 				config {
-					pins = "gpio94", "gpio95";
+					pins = "gpio95";
 					drive-strength = <8>; /* 8 MA */
 					bias-disable; /* NO pull */
 				};
@@ -919,12 +919,12 @@
 
 			wsa_vi_off: wsa_vi_off {
 				mux {
-					pins = "gpio94", "gpio95";
+					pins = "gpio95";
 					function = "wsa_io";
 				};
 
 				config {
-					pins = "gpio94", "gpio95";
+					pins = "gpio95";
 					drive-strength = <2>; /* 2 MA */
 					bias-pull-down;
 				};
@@ -1491,32 +1491,6 @@
 
 				config {
 					pins = "gpio33";
-					drive-strength = <2>;
-					output-low;
-				};
-			};
-
-			front_flash_led_enable: front_flash_led_enable {
-				mux {
-					pins = "gpio50";
-					function = "gpio";
-				};
-
-				config {
-					pins = "gpio50";
-					drive-strength = <16>;
-					output-high;
-				};
-			};
-
-			front_flash_led_disable: front_flash_led_disable {
-				mux {
-					pins = "gpio50";
-					function = "gpio";
-				};
-
-				config {
-					pins = "gpio50";
 					drive-strength = <2>;
 					output-low;
 				};

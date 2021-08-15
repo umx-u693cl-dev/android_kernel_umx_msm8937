@@ -338,15 +338,7 @@ ifeq ($(CONFIG_BUILD_ARM64_DT_OVERLAY),y)
 dtbo-$(CONFIG_ARCH_MSM8940) += msm8940-mtp-overlay.dtbo
 dtbo-$(CONFIG_ARCH_MSM8940) += msm8940-cdp-overlay.dtbo
 
-dtbo-$(CONFIG_ARCH_MSM8917) += msm8917-mtp-overlay.dtbo \
-	msm8917-qrd-overlay.dtbo \
-	msm8917-cdp-overlay.dtbo \
-	msm8917-cdp-ext-codec-overlay.dtbo \
-	msm8917-cdp-ml-touch-overlay.dtbo \
-	msm8917-rcm-overlay.dtbo \
-	apq8017-mtp-overlay.dtbo \
-	apq8017-cdp-overlay.dtbo \
-	apq8017-cdp-wcd-rome-overlay.dtbo
+dtbo-$(CONFIG_ARCH_MSM8917) += msm8917-cdp-ml-touch-overlay.dtbo
 
 dtbo-$(CONFIG_ARCH_QM215) +=qm215-qrd-overlay.dtbo
 dtbo-$(CONFIG_ARCH_QM215) +=qm215-qrd-smb1360-overlay.dtbo

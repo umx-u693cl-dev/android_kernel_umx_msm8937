@@ -293,6 +293,7 @@
 				qcom,supply-max-voltage = <1800000>;
 				qcom,supply-enable-load = <100000>;
 				qcom,supply-disable-load = <100>;
+				qcom,supply-ulp-load = <0x00>;
 			};
 		};
 
@@ -329,6 +330,8 @@
 				01 c0 00 00 0a 00 00 01 97
 				01 c0 00 00 0f 00 00 01 97
 				00 40 00 00 00 00 00 01 ff];
+			qcom,regulator-ldo-mode;
+
 		};
 
 		mdss_dsi1: qcom,mdss_dsi_ctrl1@1a96000 {
