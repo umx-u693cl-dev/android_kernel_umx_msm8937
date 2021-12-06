@@ -1313,4 +1313,14 @@ config TOUCHSCREEN_EKTF3XXX_CHIPSET
 
 		  If unusre, say N.
 
+config TOUCHSCREEN_TLSC6X
+	bool "Focaltech Touchscreen"
+		depends on I2C
+		default n
+		help
+		  Say Y here if you have tlsc6x touch panel.
+		  If unsure, say N.
+
+source "drivers/input/touchscreen/tlsc6x/Kconfig"
+
 endif
