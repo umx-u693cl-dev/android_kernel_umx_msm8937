@@ -1234,7 +1234,7 @@ int tlsc6x_selftest_crtra(void)
 	}
 	if (fw->size != sizeof(*pt_crtra_data)) {
 		ret = -EIO;
-		tlsc_err("fw->size is %d,fw->size error. sizeof(*pt_crtra_data)is %d\n",
+		tlsc_err("fw->size is %zu,fw->size error. sizeof(*pt_crtra_data)is %zu\n",
 			fw->size, sizeof(*pt_crtra_data));
 		goto exit;
 	}
@@ -1255,11 +1255,9 @@ int tlsc6x_selftest_crtra(void)
 		if (idx) {
 			m_os_rmap_buf[idx - 1] = m_os_test_buf[k];
 			if (m_os_test_buf[k] > pt_crtra_data->rawmax[k]) {
-				tlsc6x_save_failed_node(idx - 1);
 				ret |= 1;
 			}
 			if (m_os_test_buf[k] < pt_crtra_data->rawmin[k]) {
-				tlsc6x_save_failed_node(idx - 1);
 				ret |= 2;
 			}
 		}

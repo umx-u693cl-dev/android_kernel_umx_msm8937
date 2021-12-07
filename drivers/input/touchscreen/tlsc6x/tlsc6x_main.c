@@ -70,7 +70,6 @@
 #endif
 
 #include "tlsc6x_main.h"
-#include "tpd_sys.h"
 
 #define	TOUCH_VIRTUAL_KEYS
 #define	MULTI_PROTOCOL_TYPE_B	0
@@ -1501,10 +1500,6 @@ static int tlsc6x_probe(struct i2c_client *client, const struct i2c_device_id *i
 	struct tlsc6x_platform_data *pdata = NULL;
 
 	TLSC_FUNC_ENTER();
-	if (tpd_fw_cdev.TP_have_registered) {
-		pr_notice("TP have registered by other TP.\n");
-		return -EPERM;
-	}
 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_I2C)) {
 		err = -ENODEV;
 		goto exit_alloc_platform_data_failed;
@@ -1685,9 +1680,6 @@ static int tlsc6x_probe(struct i2c_client *client, const struct i2c_device_id *i
 	}
 #endif
 
-	tlsc6x_get_tp_vendor_info();
-	tlsc6x_tpd_register_fw_class();
-	tpd_fw_cdev.TP_have_registered = true;
 	tlsc_info(" tlsc6x_probe success!");
 	return 0;
 
