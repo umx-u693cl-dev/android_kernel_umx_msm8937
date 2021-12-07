@@ -117,7 +117,9 @@ static struct class *sprd_tpd_class;
 static struct device *sprd_ps_cmd_dev;
 #endif
 
-#define TLSC_PINCTRL_INIT "pmx_ts_init"
+#define PINCTRL_STATE_ACTIVE    "pmx_ts_active"
+#define PINCTRL_STATE_SUSPEND   "pmx_ts_suspend"
+#define PINCTRL_STATE_RELEASE   "pmx_ts_release"
 #ifdef CONFIG_TS_TLSC6X_MTK_INTERFACE
 #define TLSC_PINCTRL_RST_0_STATE "rst_output0"
 #define TLSC_PINCTRL_RST_1_STATE "rst_output1"
@@ -724,10 +726,22 @@ static int tlsc6x_pinctrl_init(struct tlsc6x_data *ts)
 		goto err_pinctrl_get;
 	}
 
-	ts->pins_init = pinctrl_lookup_state(ts->pinctrl, TLSC_PINCTRL_INIT);
-	if (IS_ERR_OR_NULL(ts->pins_init)) {
-		tlsc_err("Pin state[init] not found %d", IS_ERR_OR_NULL(ts->pins_init));
-		ret = PTR_ERR(ts->pins_init);
+	ts->pinctrl_state_active = pinctrl_lookup_state(ts->pinctrl, PINCTRL_STATE_ACTIVE);
+	if (IS_ERR_OR_NULL(ts->pinctrl_state_active)) {
+		tlsc_err("Pin state[active] not found %d", IS_ERR_OR_NULL(ts->pinctrl_state_active));
+		ret = PTR_ERR(ts->pinctrl_state_active);
+		goto err_pinctrl_lookup;
+	}
+	ts->pinctrl_state_suspend = pinctrl_lookup_state(ts->pinctrl, PINCTRL_STATE_SUSPEND);
+	if (IS_ERR_OR_NULL(ts->pinctrl_state_suspend)) {
+		tlsc_err("Pin state[suspend] not found %d", IS_ERR_OR_NULL(ts->pinctrl_state_suspend));
+		ret = PTR_ERR(ts->pinctrl_state_suspend);
+		goto err_pinctrl_lookup;
+	}
+	ts->pinctrl_state_release = pinctrl_lookup_state(ts->pinctrl, PINCTRL_STATE_RELEASE);
+	if (IS_ERR_OR_NULL(ts->pinctrl_state_release)) {
+		tlsc_err("Pin state[release] not found %d", IS_ERR_OR_NULL(ts->pinctrl_state_release));
+		ret = PTR_ERR(ts->pinctrl_state_release);
 		goto err_pinctrl_lookup;
 	}
 
@@ -756,7 +770,9 @@ err_pinctrl_lookup:
 	}
 err_pinctrl_get:
 	ts->pinctrl = NULL;
-	ts->pins_init = NULL;
+	ts->pinctrl_state_active = NULL;
+	ts->pinctrl_state_suspend = NULL;
+	ts->pinctrl_state_release = NULL;
 #ifdef CONFIG_TS_TLSC6X_MTK_INTERFACE
 	ts->pinctrl_rst_output0 = NULL;
 	ts->pinctrl_rst_output1 = NULL;
@@ -764,23 +780,6 @@ err_pinctrl_get:
 
 	return ret;
 }
-
-static int tlsc_pinctrl_select_init(struct tlsc6x_data *ts)
-{
-	int ret = 0;
-
-	if (ts->pinctrl && ts->pins_init) {
-		ret = pinctrl_select_state(ts->pinctrl, ts->pins_init);
-		if (ret < 0) {
-			tlsc_err("Set pin init state error:%d", ret);
-		} else {
-			tlsc_info("Set pin init state success");
-		}
-	}
-
-	return ret;
-}
-
 
 #ifdef CONFIG_TS_TLSC6X_MTK_INTERFACE
 static int tlsc_select_rst_output(struct tlsc6x_data *ts, int value)
@@ -839,7 +838,7 @@ static struct tlsc6x_platform_data *tlsc6x_parse_dt(struct device *dev)
 		goto fail;
 	}
 
-	ret = of_property_read_string(np, "vdd_name", &pdata->vdd_name);
+	ret = of_property_read_string(np, "vdd-supply", &pdata->vdd_name);
 	if (ret) {
 		tlsc_err("fail to get vdd_name\n");
 		goto fail;
@@ -851,16 +850,8 @@ static struct tlsc6x_platform_data *tlsc6x_parse_dt(struct device *dev)
 		/* goto fail; */
 	}
 	#endif
-	ret = of_property_read_u32(np, "TP_MAX_X", &pdata->x_res_max);
-	if (ret) {
-		tlsc_err("fail to get TP_MAX_X\n");
-		goto fail;
-	}
-	ret = of_property_read_u32(np, "TP_MAX_Y", &pdata->y_res_max);
-	if (ret) {
-		tlsc_err("fail to get TP_MAX_Y\n");
-		goto fail;
-	}
+	pdata->x_res_max = 480;
+	pdata->y_res_max = 854;
 
 	return pdata;
 fail:
@@ -1534,7 +1525,11 @@ static int tlsc6x_probe(struct i2c_client *client, const struct i2c_device_id *i
 		tlsc_err("tlsc6x get pinctrl failed\n");
 		goto exit_pinctrl_init_failed;
 	} else {
-		tlsc_pinctrl_select_init(g_tp_drvdata);
+		err = pinctrl_select_state(g_tp_drvdata->pinctrl,
+			g_tp_drvdata->pinctrl_state_active);
+		if (err) {
+			tlsc_err("tlsc6x set active pinctrl sadge :(((((\n");
+		}
 	}
 
 	err = tlsc6x_hw_init(g_tp_drvdata);
@@ -1694,7 +1689,9 @@ exit_chip_check_failed:
 exit_gpio_request_failed:
 	devm_pinctrl_put(g_tp_drvdata->pinctrl);
 	g_tp_drvdata->pinctrl = NULL;
-	g_tp_drvdata->pins_init = NULL;
+	g_tp_drvdata->pinctrl_state_active = NULL;
+	g_tp_drvdata->pinctrl_state_suspend = NULL;
+	g_tp_drvdata->pinctrl_state_release = NULL;
 #ifdef CONFIG_TS_TLSC6X_MTK_INTERFACE
 	g_tp_drvdata->pinctrl_rst_output0 = NULL;
 	g_tp_drvdata->pinctrl_rst_output1 = NULL;
@@ -1727,7 +1724,9 @@ static int tlsc6x_remove(struct i2c_client *client)
 
 	devm_pinctrl_put(drvdata->pinctrl);
 	drvdata->pinctrl = NULL;
-	drvdata->pins_init = NULL;
+	drvdata->pinctrl_state_active = NULL;
+	drvdata->pinctrl_state_suspend = NULL;
+	drvdata->pinctrl_state_release = NULL;
 #ifdef CONFIG_TS_TLSC6X_MTK_INTERFACE
 	drvdata->pinctrl_rst_output0 = NULL;
 	drvdata->pinctrl_rst_output1 = NULL;

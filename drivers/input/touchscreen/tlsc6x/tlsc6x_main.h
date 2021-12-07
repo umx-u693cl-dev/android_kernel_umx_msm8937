@@ -68,7 +68,9 @@ struct tlsc6x_data {
 	struct tlsc6x_platform_data *platform_data;
 
 	struct pinctrl *pinctrl;
-	struct pinctrl_state *pins_init;
+	struct pinctrl_state *pinctrl_state_active;
+	struct pinctrl_state *pinctrl_state_suspend;
+	struct pinctrl_state *pinctrl_state_release;
 #ifdef CONFIG_TS_TLSC6X_MTK_INTERFACE
 	struct pinctrl_state *pinctrl_rst_output0;
 	struct pinctrl_state *pinctrl_rst_output1;
